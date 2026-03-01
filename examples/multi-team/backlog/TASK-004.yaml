@@ -1,0 +1,33 @@
+id: TASK-004
+title: "Security review of authentication implementation"
+description: |
+  Review TASK-002 and TASK-003 implementations for security vulnerabilities.
+  Check: OWASP auth guidelines, token storage, CSRF protection, rate limiting,
+  brute force protection, session fixation, timing attacks.
+
+status: blocked
+priority: critical
+agent: security
+review: human-review
+assignee: null
+sprint: S001
+depends_on: [TASK-002, TASK-003]
+blocks: [TASK-005]
+
+definition_of_done:
+  - "OWASP authentication checklist completed"
+  - "No critical or high vulnerabilities found (or all fixed)"
+  - "Rate limiting verified on all endpoints"
+  - "Token storage security confirmed"
+  - "Human review of security findings approved"
+
+tags: [security, auth, review]
+estimate: m
+
+actual_tokens: null
+actual_duration_minutes: null
+completed: null
+
+created: 2026-01-10
+updated: 2026-01-10
+notes: "Blocked until both backend and frontend auth are complete. Security agent will review both."

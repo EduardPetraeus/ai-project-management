@@ -1,0 +1,40 @@
+# Task Template — One file per task
+# Copy this file to your project's backlog/ directory
+# Rename to TASK-XXX.yaml (sequential, zero-padded)
+#
+# Design: Each task is a separate file. Agents working in parallel
+# edit different files — no merge conflicts.
+
+id: TASK-000
+title: "Short, actionable title describing what to build or fix"
+description: |
+  Detailed context for the agent or person working on this task.
+  Include: what, why, where in the codebase, and any constraints.
+  Be specific — "recent" is vague, "last 24 hours" is precise.
+
+status: backlog        # backlog | ready | in_progress | review | done | blocked
+priority: medium       # critical | high | medium | low
+agent: code            # code | test | docs | security | review | human
+review: agent-review   # auto-merge | agent-review | human-review
+assignee: null         # agent-session-id or person — null means unassigned
+sprint: null           # S001 format — null means unscheduled
+
+depends_on: []         # [TASK-001, TASK-002] — tasks that must complete first
+blocks: []             # [TASK-010] — tasks waiting on this one
+
+definition_of_done:
+  - "First measurable criterion"
+  - "Second measurable criterion"
+  - "Tests pass (if applicable)"
+
+tags: []               # [backend, data-pipeline, security] — for filtering
+estimate: m            # xs=minutes, s=<1h, m=1-3h, l=3-8h, xl=multi-session
+
+# Populated after completion (by agent or command)
+actual_tokens: null
+actual_duration_minutes: null
+completed: null
+
+created: 2026-01-01
+updated: 2026-01-01
+notes: ""

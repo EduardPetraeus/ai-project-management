@@ -1,0 +1,32 @@
+id: TASK-002
+title: "Build silver-layer sleep aggregation transform"
+description: |
+  Transform bronze Oura sleep data into silver-layer aggregated metrics.
+  Calculate: total_sleep_hours, deep_sleep_pct, rem_sleep_pct, sleep_score.
+  Output as daily granularity in silver/ directory.
+
+status: ready
+priority: high
+agent: code
+review: agent-review
+assignee: null
+sprint: S001
+depends_on: [TASK-001]
+blocks: [TASK-005]
+
+definition_of_done:
+  - "SQL transform produces daily sleep metrics"
+  - "All percentage columns sum to <= 100%"
+  - "Null handling for missing nights"
+  - "dbt schema tests pass"
+
+tags: [data-pipeline, silver, sleep]
+estimate: m
+
+actual_tokens: null
+actual_duration_minutes: null
+completed: null
+
+created: 2026-01-10
+updated: 2026-01-15
+notes: "Unblocked after TASK-001 completed."

@@ -1,0 +1,67 @@
+# Roles Template
+# Maps agent types to task categories for automatic routing.
+# Used by pick-next-task command to assign tasks to the right agent.
+
+roles:
+  code:
+    description: "Writes and modifies source code"
+    handles:
+      - backend
+      - frontend
+      - data-pipeline
+      - infrastructure
+    trust_level: standard    # references governance TRUST_PROFILE
+    review_default: agent-review
+
+  test:
+    description: "Writes tests, runs test suites, validates coverage"
+    handles:
+      - unit-test
+      - integration-test
+      - data-test
+      - mutation-test
+    trust_level: standard
+    review_default: auto-merge
+
+  docs:
+    description: "Writes documentation, READMEs, architecture docs"
+    handles:
+      - documentation
+      - architecture
+      - changelog
+    trust_level: elevated
+    review_default: auto-merge
+
+  security:
+    description: "Security reviews, dependency audits, vulnerability scanning"
+    handles:
+      - security-review
+      - dependency-audit
+      - secret-scanning
+    trust_level: restricted
+    review_default: human-review
+
+  review:
+    description: "Code review, PR review, quality checks"
+    handles:
+      - code-review
+      - pr-review
+      - quality-gate
+    trust_level: standard
+    review_default: human-review
+
+  human:
+    description: "Tasks requiring human judgment or external action"
+    handles:
+      - design-decision
+      - vendor-setup
+      - payment
+      - account-creation
+    trust_level: null
+    review_default: null
+
+# Routing rules for solo developer (simplified)
+solo_mode:
+  enabled: true
+  description: "All agent roles handled by a single Claude Code session"
+  routing: "pick-next-task selects by priority regardless of agent type"

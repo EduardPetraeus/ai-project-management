@@ -1,0 +1,25 @@
+# Roadmap Template
+# High-level milestones. Not tasks — milestones contain sprints or task groups.
+
+project: "Project Name"
+updated: 2026-01-01
+
+milestones:
+  - id: M001
+    title: "First milestone title"
+    target_date: 2026-02-01
+    status: in_progress  # planned | in_progress | completed | cancelled
+    description: "What this milestone delivers"
+    sprints: [S001, S002]
+    success_criteria:
+      - "Criterion 1"
+      - "Criterion 2"
+
+  - id: M002
+    title: "Second milestone title"
+    target_date: 2026-03-01
+    status: planned
+    description: "What this milestone delivers"
+    sprints: []
+    success_criteria:
+      - "Criterion 1"

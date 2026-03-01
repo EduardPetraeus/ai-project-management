@@ -1,0 +1,51 @@
+# Multi-team ROLES.yaml — Example
+# Shows how multiple agents are routed to different task types.
+
+roles:
+  code:
+    description: "Writes and modifies source code"
+    handles:
+      - backend
+      - frontend
+      - data-pipeline
+    trust_level: standard
+    review_default: agent-review
+    # In multi-team mode, further split by tag:
+    # - backend-agent handles [backend] tagged tasks
+    # - frontend-agent handles [frontend] tagged tasks
+    routing_by_tag:
+      backend: backend-agent
+      frontend: frontend-agent
+      data-pipeline: data-agent
+
+  docs:
+    description: "API schemas, documentation, architecture"
+    handles:
+      - api
+      - schema
+      - architecture
+      - documentation
+    trust_level: elevated
+    review_default: human-review  # schemas need human approval
+
+  security:
+    description: "Security reviews and vulnerability scanning"
+    handles:
+      - security-review
+      - auth
+      - dependency-audit
+    trust_level: restricted
+    review_default: human-review
+
+  test:
+    description: "Integration tests, E2E tests, load tests"
+    handles:
+      - integration-test
+      - e2e-test
+      - load-test
+    trust_level: standard
+    review_default: auto-merge
+
+solo_mode:
+  enabled: false
+  description: "Multi-team mode — agents routed by role and tag"

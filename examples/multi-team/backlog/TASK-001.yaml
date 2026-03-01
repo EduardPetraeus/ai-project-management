@@ -1,0 +1,32 @@
+id: TASK-001
+title: "Design API schema for user authentication endpoints"
+description: |
+  Define the OpenAPI schema for login, logout, refresh token, and register endpoints.
+  Include request/response schemas, error codes, and rate limiting headers.
+  This is the contract that frontend and backend teams code against.
+
+status: done
+priority: critical
+agent: docs
+review: human-review
+assignee: docs-agent-session-001
+sprint: S001
+depends_on: []
+blocks: [TASK-002, TASK-003, TASK-004]
+
+definition_of_done:
+  - "OpenAPI 3.1 schema validates with spectral lint"
+  - "All endpoints have request + response + error schemas"
+  - "Rate limiting headers documented"
+  - "Human review approved"
+
+tags: [api, auth, schema, architecture]
+estimate: m
+
+actual_tokens: 32000
+actual_duration_minutes: 18
+completed: 2026-01-12
+
+created: 2026-01-10
+updated: 2026-01-12
+notes: "Human reviewed and approved the schema. Minor changes to error codes."

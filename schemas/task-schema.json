@@ -1,0 +1,113 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Task",
+  "description": "Schema for individual task YAML files in the agentic project management system",
+  "type": "object",
+  "required": ["id", "title", "status", "priority", "agent", "review", "created"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^TASK-\\d{3,}$",
+      "description": "Unique task identifier (e.g., TASK-001)"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 120,
+      "description": "Short, actionable task title"
+    },
+    "description": {
+      "type": "string",
+      "description": "Detailed description of what needs to be done"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["backlog", "ready", "in_progress", "review", "done", "blocked"],
+      "description": "Current task status"
+    },
+    "priority": {
+      "type": "string",
+      "enum": ["critical", "high", "medium", "low"],
+      "description": "Task priority level"
+    },
+    "agent": {
+      "type": "string",
+      "enum": ["code", "test", "docs", "security", "review", "human"],
+      "description": "Which agent type should handle this task"
+    },
+    "review": {
+      "type": "string",
+      "enum": ["auto-merge", "agent-review", "human-review"],
+      "description": "Review strategy for completed work"
+    },
+    "assignee": {
+      "type": ["string", "null"],
+      "description": "Agent session ID or person assigned to this task"
+    },
+    "sprint": {
+      "type": ["string", "null"],
+      "pattern": "^S\\d{3,}$",
+      "description": "Sprint this task belongs to (e.g., S001)"
+    },
+    "depends_on": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^TASK-\\d{3,}$"
+      },
+      "description": "Task IDs that must be completed before this task can start"
+    },
+    "blocks": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^TASK-\\d{3,}$"
+      },
+      "description": "Task IDs that cannot start until this task is done"
+    },
+    "definition_of_done": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1,
+      "description": "Measurable criteria that must be met for the task to be considered done"
+    },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Labels for categorization and filtering"
+    },
+    "estimate": {
+      "type": "string",
+      "enum": ["xs", "s", "m", "l", "xl"],
+      "description": "T-shirt size estimate (xs=minutes, s=<1h, m=1-3h, l=3-8h, xl=multi-session)"
+    },
+    "actual_tokens": {
+      "type": ["integer", "null"],
+      "description": "Actual tokens consumed (populated after completion)"
+    },
+    "actual_duration_minutes": {
+      "type": ["integer", "null"],
+      "description": "Actual time in minutes (populated after completion)"
+    },
+    "created": {
+      "type": "string",
+      "format": "date",
+      "description": "Date the task was created"
+    },
+    "updated": {
+      "type": "string",
+      "format": "date",
+      "description": "Date the task was last updated"
+    },
+    "completed": {
+      "type": ["string", "null"],
+      "format": "date",
+      "description": "Date the task was completed"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Free-form notes, context, or session handover information"
+    }
+  },
+  "additionalProperties": false
+}

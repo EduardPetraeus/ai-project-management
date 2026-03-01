@@ -1,0 +1,22 @@
+# Sprint Template
+# One file per sprint. References tasks by ID — tasks live in backlog/.
+
+id: S001
+title: "Sprint goal in one sentence"
+status: planning       # planning | active | review | completed
+start_date: 2026-01-01
+end_date: 2026-01-14   # 2-week default
+
+goal: |
+  What this sprint delivers and why it matters.
+  Keep it outcome-focused, not task-focused.
+
+tasks:
+  - TASK-001
+  - TASK-002
+  - TASK-003
+
+# Populated during/after sprint
+velocity: null         # tasks completed / tasks planned
+tokens_consumed: null  # total tokens across all tasks
+notes: ""

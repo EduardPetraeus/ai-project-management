@@ -1,0 +1,31 @@
+id: TASK-003
+title: "Build silver-layer activity aggregation transform"
+description: |
+  Transform bronze Oura activity data into silver-layer metrics.
+  Calculate: steps, calories, active_minutes, activity_score.
+  Daily granularity in silver/ directory.
+
+status: blocked
+priority: medium
+agent: code
+review: agent-review
+assignee: null
+sprint: S001
+depends_on: [TASK-001]
+blocks: []
+
+definition_of_done:
+  - "SQL transform produces daily activity metrics"
+  - "Handles days with zero activity"
+  - "dbt schema tests pass"
+
+tags: [data-pipeline, silver, activity]
+estimate: s
+
+actual_tokens: null
+actual_duration_minutes: null
+completed: null
+
+created: 2026-01-10
+updated: 2026-01-10
+notes: ""

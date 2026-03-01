@@ -1,0 +1,47 @@
+# Metrics Template
+# Track agent performance, cost, and velocity per project.
+# Populated by complete-task command after each task.
+
+project: "Project Name"
+updated: 2026-01-01
+
+# Per-sprint aggregates
+sprints:
+  - id: S001
+    tasks_planned: 0
+    tasks_completed: 0
+    tasks_blocked: 0
+    total_tokens: 0
+    total_duration_minutes: 0
+    velocity: 0.0           # completed / planned
+
+# Per-agent-type breakdown
+agent_performance:
+  code:
+    tasks_completed: 0
+    avg_tokens_per_task: 0
+    avg_duration_minutes: 0
+    retry_rate: 0.0          # tasks requiring >1 attempt
+  test:
+    tasks_completed: 0
+    avg_tokens_per_task: 0
+    avg_duration_minutes: 0
+    retry_rate: 0.0
+  docs:
+    tasks_completed: 0
+    avg_tokens_per_task: 0
+    avg_duration_minutes: 0
+    retry_rate: 0.0
+
+# Cost tracking
+cost:
+  total_tokens: 0
+  estimated_cost_usd: 0.0
+  cost_per_task_avg: 0.0
+
+# Quality indicators
+quality:
+  tasks_with_test_failures: 0
+  tasks_requiring_rework: 0
+  human_interventions: 0     # times human had to unblock or override
+  stuck_incidents: 0         # STUCK.md created

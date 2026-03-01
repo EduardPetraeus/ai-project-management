@@ -1,0 +1,62 @@
+# Trust Profile Template
+# Defines per-context trust levels. References governance framework patterns.
+# Copied into project repos and customized.
+
+profiles:
+  elevated:
+    description: "Low-risk, high-confidence tasks"
+    applies_to:
+      - documentation updates
+      - test additions
+      - changelog entries
+    permissions:
+      auto_commit: true
+      auto_merge: false
+      max_files_per_change: 10
+      allowed_directories: ["docs/", "tests/", "CHANGELOG.md"]
+    governance_ref: "ai-governance-framework/patterns/progressive-trust.md"
+
+  standard:
+    description: "Normal development work"
+    applies_to:
+      - feature implementation
+      - bug fixes
+      - refactoring
+    permissions:
+      auto_commit: true
+      auto_merge: false
+      max_files_per_change: 20
+      allowed_directories: ["src/", "lib/", "config/"]
+    governance_ref: "ai-governance-framework/patterns/blast-radius-control.md"
+
+  restricted:
+    description: "High-risk changes requiring extra review"
+    applies_to:
+      - security changes
+      - infrastructure changes
+      - database migrations
+      - CI/CD pipeline changes
+    permissions:
+      auto_commit: false
+      auto_merge: false
+      max_files_per_change: 5
+      allowed_directories: []  # explicit approval required
+    governance_ref: "ai-governance-framework/patterns/automation-bias-defense.md"
+
+  critical:
+    description: "Changes that require human approval before any action"
+    applies_to:
+      - production deployments
+      - data deletion
+      - permission changes
+      - secret rotation
+    permissions:
+      auto_commit: false
+      auto_merge: false
+      max_files_per_change: 1
+      requires_human_approval: true
+    governance_ref: "ai-governance-framework/patterns/blast-radius-control.md"
+
+# Confidence ceiling (from governance framework)
+confidence_ceiling: 0.85
+confidence_note: "AI validation capped at 85%. Always surface what was NOT verified."

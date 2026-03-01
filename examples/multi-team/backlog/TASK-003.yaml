@@ -1,0 +1,33 @@
+id: TASK-003
+title: "Implement frontend login form and token management"
+description: |
+  Build the React login form component and token management hooks.
+  Store tokens in httpOnly cookies (not localStorage).
+  Auto-refresh tokens before expiry using the refresh endpoint from TASK-001 schema.
+
+status: in_progress
+priority: critical
+agent: code
+review: agent-review
+assignee: frontend-agent-session-002
+sprint: S001
+depends_on: [TASK-001]
+blocks: [TASK-005]
+
+definition_of_done:
+  - "Login form with email + password fields"
+  - "Token stored in httpOnly cookie"
+  - "Auto-refresh hook triggers before token expiry"
+  - "Error states displayed to user"
+  - "Component tests pass"
+
+tags: [frontend, auth, react]
+estimate: m
+
+actual_tokens: null
+actual_duration_minutes: null
+completed: null
+
+created: 2026-01-10
+updated: 2026-01-13
+notes: "Frontend agent working in parallel with backend agent. Both depend on schema, not on each other."

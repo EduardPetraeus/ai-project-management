@@ -1,0 +1,33 @@
+id: TASK-002
+title: "Implement backend authentication endpoints"
+description: |
+  Build the FastAPI endpoints matching the approved API schema from TASK-001.
+  Use JWT tokens with refresh rotation. Store sessions in Redis.
+  Follow engineering standards for error handling and logging.
+
+status: in_progress
+priority: critical
+agent: code
+review: agent-review
+assignee: backend-agent-session-003
+sprint: S001
+depends_on: [TASK-001]
+blocks: [TASK-005]
+
+definition_of_done:
+  - "All 4 endpoints return correct status codes"
+  - "JWT token generation and validation working"
+  - "Refresh token rotation implemented"
+  - "Unit tests cover happy path + error cases"
+  - "Integration test with Redis passes"
+
+tags: [backend, auth, api]
+estimate: l
+
+actual_tokens: null
+actual_duration_minutes: null
+completed: null
+
+created: 2026-01-10
+updated: 2026-01-13
+notes: "Claimed by backend agent. Login and register endpoints done, working on refresh flow."

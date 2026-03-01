@@ -1,0 +1,32 @@
+id: TASK-001
+title: "Set up bronze-layer ingestion for Oura ring data"
+description: |
+  Create the initial data pipeline for ingesting Oura ring data.
+  Read from CSV export, validate schema, write to bronze Parquet.
+  Follow medallion architecture: raw data lands in bronze unchanged.
+
+status: done
+priority: high
+agent: code
+review: agent-review
+assignee: claude-session-001
+sprint: S001
+depends_on: []
+blocks: [TASK-002, TASK-003]
+
+definition_of_done:
+  - "CSV reader handles all Oura export columns"
+  - "Parquet output in bronze/ directory"
+  - "Schema validation catches missing required columns"
+  - "Unit tests pass"
+
+tags: [data-pipeline, bronze, oura]
+estimate: m
+
+actual_tokens: 45000
+actual_duration_minutes: 22
+completed: 2026-01-15
+
+created: 2026-01-10
+updated: 2026-01-15
+notes: "Completed in single session. Schema validation caught 2 edge cases."
