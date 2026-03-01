@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Trust Profile",
+  "description": "Schema for trust profile YAML files — per-context trust levels",
+  "type": "object",
+  "required": ["profiles"],
+  "properties": {
+    "profiles": {
+      "type": "object",
+      "patternProperties": {
+        "^[a-z][a-z0-9_-]*$": {
+          "type": "object",
+          "required": ["description", "applies_to", "permissions"],
+          "properties": {
+            "description": {
+              "type": "string",
+              "description": "What this trust level covers"
+            },
+            "applies_to": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 1,
+              "description": "Contexts where this trust level applies"
+            },
+            "permissions": {
+              "type": "object",
+              "properties": {
+                "auto_commit": {
+                  "type": "boolean",
+                  "description": "Whether agent can commit without approval"
+                },
+                "auto_merge": {
+                  "type": "boolean",
+                  "description": "Whether agent can merge without approval"
+                },
+                "max_files_per_change": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "description": "Maximum files that can be changed in one commit"
+                },
+                "allowed_directories": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Directories the agent may modify"
+                },
+                "requires_human_approval": {
+                  "type": "boolean",
+                  "description": "Whether human must approve before any action"
+                }
+              },
+              "additionalProperties": false
+            },
+            "governance_ref": {
+              "type": "string",
+              "description": "Reference to governance framework pattern"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "confidence_ceiling": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Maximum confidence cap for AI validation"
+    },
+    "confidence_note": {
+      "type": "string",
+      "description": "Explanation of the confidence ceiling"
+    }
+  },
+  "additionalProperties": false
+}

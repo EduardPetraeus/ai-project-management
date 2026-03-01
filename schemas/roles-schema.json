@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Roles",
+  "description": "Schema for roles YAML files — maps agent types to task categories",
+  "type": "object",
+  "required": ["roles"],
+  "properties": {
+    "roles": {
+      "type": "object",
+      "patternProperties": {
+        "^[a-z][a-z0-9_-]*$": {
+          "type": "object",
+          "required": ["description", "handles"],
+          "properties": {
+            "description": {
+              "type": "string",
+              "description": "What this agent role does"
+            },
+            "handles": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 1,
+              "description": "Task categories this role handles"
+            },
+            "trust_level": {
+              "type": ["string", "null"],
+              "enum": ["elevated", "standard", "restricted", "critical", null],
+              "description": "Trust level from governance framework"
+            },
+            "review_default": {
+              "type": ["string", "null"],
+              "enum": ["auto-merge", "agent-review", "human-review", null],
+              "description": "Default review strategy for this role"
+            },
+            "routing_by_tag": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              },
+              "description": "Optional tag-based routing for multi-team setups"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "solo_mode": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "description": {
+          "type": "string"
+        },
+        "routing": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

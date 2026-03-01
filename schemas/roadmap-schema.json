@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Roadmap",
+  "description": "Schema for roadmap YAML files in the agentic project management system",
+  "type": "object",
+  "required": ["project", "updated", "milestones"],
+  "properties": {
+    "project": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Project name"
+    },
+    "updated": {
+      "type": "string",
+      "format": "date",
+      "description": "Date the roadmap was last updated"
+    },
+    "milestones": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "target_date", "status", "description"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^M\\d{3,}$",
+            "description": "Unique milestone identifier (e.g., M001)"
+          },
+          "title": {
+            "type": "string",
+            "minLength": 5,
+            "maxLength": 120,
+            "description": "Milestone title"
+          },
+          "target_date": {
+            "type": "string",
+            "format": "date",
+            "description": "Target completion date"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["planned", "in_progress", "completed", "cancelled"],
+            "description": "Current milestone status"
+          },
+          "description": {
+            "type": "string",
+            "description": "What this milestone delivers"
+          },
+          "sprints": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^S\\d{3,}$"
+            },
+            "description": "Sprint IDs included in this milestone"
+          },
+          "success_criteria": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1,
+            "description": "Measurable success criteria for the milestone"
+          }
+        },
+        "additionalProperties": false
+      },
+      "description": "Ordered list of project milestones"
+    }
+  },
+  "additionalProperties": false
+}

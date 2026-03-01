@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Sprint",
+  "description": "Schema for sprint YAML files in the agentic project management system",
+  "type": "object",
+  "required": ["id", "title", "status", "start_date", "end_date", "goal", "tasks"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^S\\d{3,}$",
+      "description": "Unique sprint identifier (e.g., S001)"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 120,
+      "description": "Sprint goal in one sentence"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["planning", "active", "review", "completed"],
+      "description": "Current sprint status"
+    },
+    "start_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Sprint start date"
+    },
+    "end_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Sprint end date"
+    },
+    "goal": {
+      "type": "string",
+      "minLength": 10,
+      "description": "Outcome-focused sprint goal"
+    },
+    "tasks": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^TASK-\\d{3,}$"
+      },
+      "description": "List of task IDs included in this sprint"
+    },
+    "velocity": {
+      "type": ["number", "null"],
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Tasks completed / tasks planned (populated after sprint)"
+    },
+    "tokens_consumed": {
+      "type": ["integer", "null"],
+      "minimum": 0,
+      "description": "Total tokens consumed across all tasks in this sprint"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Retrospective notes or observations"
+    }
+  },
+  "additionalProperties": false
+}
