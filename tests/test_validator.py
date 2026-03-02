@@ -2,9 +2,12 @@
 
 from pathlib import Path
 
+import yaml
+
 from ai_pm.validator import (
     find_schema_for_file,
     load_schema,
+    validate_cross_references,
     validate_file,
     validate_yaml_against_schema,
 )
@@ -209,6 +212,105 @@ class TestValidateFile:
         is_valid, errors = validate_file(f, schemas_dir, quiet=True)
         # No schema means skip — treated as valid
         assert is_valid
+
+
+class TestCrossReferenceValidation:
+    """Test cross-file task reference validation."""
+
+    def test_valid_references(self, tmp_path):
+        """No errors when all depends_on references exist."""
+        tasks = [
+            {"id": "TASK-001", "title": "First", "status": "done", "priority": "high", "depends_on": []},
+            {
+                "id": "TASK-002",
+                "title": "Second",
+                "status": "ready",
+                "priority": "high",
+                "depends_on": ["TASK-001"],
+            },
+        ]
+        for t in tasks:
+            (tmp_path / f"{t['id']}.yaml").write_text(yaml.dump(t))
+
+        errors = validate_cross_references(tmp_path)
+        assert errors == []
+
+    def test_catches_nonexistent_depends_on(self, tmp_path):
+        """Reports error when depends_on references TASK-999 that does not exist."""
+        task = {
+            "id": "TASK-001",
+            "title": "Lonely task",
+            "status": "ready",
+            "priority": "high",
+            "depends_on": ["TASK-999"],
+        }
+        (tmp_path / "TASK-001.yaml").write_text(yaml.dump(task))
+
+        errors = validate_cross_references(tmp_path)
+        assert len(errors) == 1
+        assert "TASK-999" in errors[0]
+        assert "non-existent" in errors[0]
+
+    def test_catches_nonexistent_blocks(self, tmp_path):
+        """Reports error when blocks references a task that does not exist."""
+        task = {
+            "id": "TASK-001",
+            "title": "Blocker",
+            "status": "ready",
+            "priority": "high",
+            "depends_on": [],
+            "blocks": ["TASK-888"],
+        }
+        (tmp_path / "TASK-001.yaml").write_text(yaml.dump(task))
+
+        errors = validate_cross_references(tmp_path)
+        assert len(errors) == 1
+        assert "TASK-888" in errors[0]
+        assert "non-existent" in errors[0]
+
+    def test_multiple_broken_references(self, tmp_path):
+        """Reports multiple errors for multiple broken references."""
+        tasks = [
+            {
+                "id": "TASK-001",
+                "title": "First",
+                "status": "ready",
+                "priority": "high",
+                "depends_on": ["TASK-999"],
+                "blocks": ["TASK-888"],
+            },
+            {
+                "id": "TASK-002",
+                "title": "Second",
+                "status": "ready",
+                "priority": "high",
+                "depends_on": ["TASK-777"],
+            },
+        ]
+        for t in tasks:
+            (tmp_path / f"{t['id']}.yaml").write_text(yaml.dump(t))
+
+        errors = validate_cross_references(tmp_path)
+        assert len(errors) == 3
+
+    def test_empty_directory(self, tmp_path):
+        """No errors for an empty directory."""
+        errors = validate_cross_references(tmp_path)
+        assert errors == []
+
+    def test_null_depends_on(self, tmp_path):
+        """Handles depends_on being null gracefully."""
+        task = {
+            "id": "TASK-001",
+            "title": "Null deps",
+            "status": "ready",
+            "priority": "high",
+            "depends_on": None,
+        }
+        (tmp_path / "TASK-001.yaml").write_text(yaml.dump(task))
+
+        errors = validate_cross_references(tmp_path)
+        assert errors == []
 
 
 class TestLoadSchema:

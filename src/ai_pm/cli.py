@@ -14,7 +14,7 @@ from rich.table import Table
 
 from ai_pm.engine import TaskEngine, TaskStatus
 from ai_pm.parser import ParseError, discover_yaml_files, find_backlog_dir, load_all_tasks, load_yaml_file
-from ai_pm.validator import SCHEMAS_DIR, find_schema_for_file, validate_file
+from ai_pm.validator import SCHEMAS_DIR, find_schema_for_file, validate_cross_references, validate_file
 
 console = Console()
 
@@ -68,6 +68,14 @@ def validate(path: str, schemas_dir: str | None):
             error_text = "\n".join(f"    - {e}" for e in errors)
             console.print(f"  [red]FAIL[/red] {yaml_path} ({schema_path.stem})\n{error_text}")
             failed += 1
+
+    # Cross-file reference validation
+    xref_errors = validate_cross_references(target)
+    if xref_errors:
+        console.print("\n[bold red]Cross-reference errors:[/bold red]")
+        for err in xref_errors:
+            console.print(f"  [red]-[/red] {err}")
+        failed += len(xref_errors)
 
     console.print(f"\n[bold]Results:[/bold] {passed} passed, {failed} failed, {skipped} skipped ({total} total)")
 
@@ -283,6 +291,79 @@ def task_complete(task_id: str, search_path: str, tokens: int | None, duration: 
             f"  Completed: {today}\n"
             f"  Unblocked: {', '.join(unblocked) if unblocked else 'none'}",
             title="Done",
+        )
+    )
+
+
+@cli.command("critical-path")
+@click.argument("path", type=click.Path(exists=True))
+def critical_path_cmd(path: str):
+    """Show the critical path (longest dependency chain) through the task DAG."""
+    target = Path(path)
+    backlog = find_backlog_dir(target)
+
+    if backlog is None:
+        console.print("[red]No backlog/ directory found with TASK-*.yaml files[/red]")
+        sys.exit(1)
+
+    tasks = load_all_tasks(backlog)
+    if not tasks:
+        console.print("[yellow]No tasks found[/yellow]")
+        return
+
+    engine = TaskEngine(tasks)
+    cp = engine.critical_path()
+
+    if not cp:
+        console.print("[green]All tasks are done — no critical path.[/green]")
+        return
+
+    console.print(f"\n[bold]Critical Path ({len(cp)} tasks):[/bold]\n")
+    for i, task_id in enumerate(cp, 1):
+        task = engine.get_task(task_id)
+        title = task.get("title", "Untitled") if task else "?"
+        status = task.get("status", "?") if task else "?"
+        console.print(f"  {i}. [cyan]{task_id}[/cyan] — {title} [{status}]")
+        if i < len(cp):
+            console.print("     |")
+
+    console.print()
+
+
+@cli.command("pick-next")
+@click.argument("path", type=click.Path(exists=True))
+@click.option("--agent", default=None, help="Filter by agent type")
+def pick_next_cmd(path: str, agent: str | None):
+    """Pick the highest-priority unblocked task ready for work."""
+    target = Path(path)
+    backlog = find_backlog_dir(target)
+
+    if backlog is None:
+        console.print("[red]No backlog/ directory found with TASK-*.yaml files[/red]")
+        sys.exit(1)
+
+    tasks = load_all_tasks(backlog)
+    if not tasks:
+        console.print("[yellow]No tasks found[/yellow]")
+        return
+
+    engine = TaskEngine(tasks)
+    picked = engine.pick_next(agent_type=agent)
+
+    if picked is None:
+        console.print("[yellow]No unblocked ready tasks available.[/yellow]")
+        return
+
+    console.print(
+        Panel(
+            f"[green]Next Task[/green]\n"
+            f"  ID:       {picked.get('id', '?')}\n"
+            f"  Title:    {picked.get('title', 'Untitled')}\n"
+            f"  Priority: {picked.get('priority', '?')}\n"
+            f"  Agent:    {picked.get('agent', '?')}\n"
+            f"  Status:   {picked.get('status', '?')}\n"
+            f"  Deps:     {', '.join(picked.get('depends_on', []) or []) or 'none'}",
+            title="Pick Next",
         )
     )
 

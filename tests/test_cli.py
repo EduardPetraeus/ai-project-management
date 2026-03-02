@@ -214,6 +214,147 @@ class TestLintCommand:
         assert result.exit_code == 0
 
 
+class TestCriticalPathCommand:
+    """Test the critical-path CLI command."""
+
+    def test_critical_path_shows_chain(self, tmp_backlog):
+        runner = CliRunner()
+        result = runner.invoke(cli, ["critical-path", str(tmp_backlog)])
+        assert result.exit_code == 0
+        # The chain should include TASK-002 -> TASK-003 (TASK-001 is done)
+        assert "TASK-002" in result.output
+        assert "TASK-003" in result.output
+        assert "Critical Path" in result.output
+
+    def test_critical_path_all_done(self, tmp_path):
+        backlog = tmp_path / "backlog"
+        backlog.mkdir()
+        task = {
+            "id": "TASK-001",
+            "title": "Done task",
+            "status": "done",
+            "priority": "high",
+            "depends_on": [],
+        }
+        (backlog / "TASK-001.yaml").write_text(yaml.dump(task))
+
+        runner = CliRunner()
+        result = runner.invoke(cli, ["critical-path", str(tmp_path)])
+        assert result.exit_code == 0
+        assert "All tasks are done" in result.output
+
+    def test_critical_path_no_backlog(self, tmp_path):
+        runner = CliRunner()
+        result = runner.invoke(cli, ["critical-path", str(tmp_path)])
+        assert result.exit_code != 0
+        assert "No backlog" in result.output
+
+    def test_critical_path_with_dag(self, tmp_path):
+        """Test critical path picks the longest chain in a DAG."""
+        backlog = tmp_path / "backlog"
+        backlog.mkdir()
+        tasks = [
+            {"id": "TASK-001", "title": "Root", "status": "ready", "priority": "high", "depends_on": []},
+            {
+                "id": "TASK-002",
+                "title": "Branch A",
+                "status": "blocked",
+                "priority": "high",
+                "depends_on": ["TASK-001"],
+            },
+            {
+                "id": "TASK-003",
+                "title": "Branch A deep",
+                "status": "blocked",
+                "priority": "high",
+                "depends_on": ["TASK-002"],
+            },
+            {
+                "id": "TASK-004",
+                "title": "Branch B (short)",
+                "status": "blocked",
+                "priority": "high",
+                "depends_on": ["TASK-001"],
+            },
+        ]
+        for t in tasks:
+            (backlog / f"{t['id']}.yaml").write_text(yaml.dump(t))
+
+        runner = CliRunner()
+        result = runner.invoke(cli, ["critical-path", str(tmp_path)])
+        assert result.exit_code == 0
+        # Longest chain: TASK-001 -> TASK-002 -> TASK-003 (length 3)
+        assert "TASK-001" in result.output
+        assert "TASK-002" in result.output
+        assert "TASK-003" in result.output
+
+
+class TestPickNextCommand:
+    """Test the pick-next CLI command."""
+
+    def test_pick_next_selects_ready_task(self, tmp_backlog):
+        runner = CliRunner()
+        result = runner.invoke(cli, ["pick-next", str(tmp_backlog)])
+        assert result.exit_code == 0
+        # TASK-002 is ready with deps done (TASK-001 is done), unassigned
+        assert "TASK-002" in result.output
+        assert "Pick Next" in result.output
+
+    def test_pick_next_no_backlog(self, tmp_path):
+        runner = CliRunner()
+        result = runner.invoke(cli, ["pick-next", str(tmp_path)])
+        assert result.exit_code != 0
+        assert "No backlog" in result.output
+
+    def test_pick_next_no_ready_tasks(self, tmp_path):
+        backlog = tmp_path / "backlog"
+        backlog.mkdir()
+        task = {
+            "id": "TASK-001",
+            "title": "Done task",
+            "status": "done",
+            "priority": "high",
+            "depends_on": [],
+        }
+        (backlog / "TASK-001.yaml").write_text(yaml.dump(task))
+
+        runner = CliRunner()
+        result = runner.invoke(cli, ["pick-next", str(tmp_path)])
+        assert result.exit_code == 0
+        assert "No unblocked ready tasks" in result.output
+
+    def test_pick_next_with_agent_filter(self, tmp_path):
+        backlog = tmp_path / "backlog"
+        backlog.mkdir()
+        tasks = [
+            {
+                "id": "TASK-001",
+                "title": "Code task",
+                "status": "ready",
+                "priority": "high",
+                "agent": "code",
+                "depends_on": [],
+                "assignee": None,
+            },
+            {
+                "id": "TASK-002",
+                "title": "Test task",
+                "status": "ready",
+                "priority": "critical",
+                "agent": "test",
+                "depends_on": [],
+                "assignee": None,
+            },
+        ]
+        for t in tasks:
+            (backlog / f"{t['id']}.yaml").write_text(yaml.dump(t))
+
+        runner = CliRunner()
+        result = runner.invoke(cli, ["pick-next", str(tmp_path), "--agent", "test"])
+        assert result.exit_code == 0
+        assert "TASK-002" in result.output
+
+
 class TestSprintStatusCommand:
     """Test the sprint status CLI command."""
 

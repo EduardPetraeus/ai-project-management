@@ -9,7 +9,7 @@ import jsonschema
 from rich.console import Console
 from rich.panel import Panel
 
-from ai_pm.parser import ParseError, load_yaml_file
+from ai_pm.parser import ParseError, discover_yaml_files, load_yaml_file
 
 console = Console()
 
@@ -171,3 +171,44 @@ def validate_file(
             console.print(f"  [green]PASS[/green] {path} ({schema_path.stem})")
 
     return len(errors) == 0, errors
+
+
+def validate_cross_references(task_dir: Path) -> list[str]:
+    """Validate that depends_on and blocks references point to existing tasks.
+
+    Scans all TASK-*.yaml files in the given directory and checks that
+    every task ID referenced in ``depends_on`` or ``blocks`` fields
+    corresponds to an actual task file in the same directory.
+
+    Args:
+        task_dir: Directory containing TASK-*.yaml files.
+
+    Returns:
+        List of human-readable error strings (empty if all references valid).
+    """
+    # Discover all task files and build the set of known IDs
+    known_ids: set[str] = set()
+    task_data: list[tuple[str, dict]] = []
+
+    for yaml_path in discover_yaml_files(task_dir, recursive=False):
+        if not yaml_path.stem.startswith("TASK-"):
+            continue
+        try:
+            data = load_yaml_file(yaml_path)
+        except ParseError:
+            continue
+        task_id = data.get("id", yaml_path.stem)
+        known_ids.add(task_id)
+        task_data.append((task_id, data))
+
+    # Check every reference
+    errors: list[str] = []
+    for task_id, data in task_data:
+        for dep in data.get("depends_on", []) or []:
+            if dep not in known_ids:
+                errors.append(f"{task_id}: depends_on references non-existent task '{dep}'")
+        for blocked in data.get("blocks", []) or []:
+            if blocked not in known_ids:
+                errors.append(f"{task_id}: blocks references non-existent task '{blocked}'")
+
+    return errors

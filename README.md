@@ -59,6 +59,72 @@ docs/
 └── INTEGRATION.md                # connecting to governance + standards
 ```
 
+## CLI
+
+Install: `pip install -e .` (or add `src/` to `PYTHONPATH`).
+
+```bash
+# Validate all YAML files against schemas (+ cross-reference check)
+ai-pm validate .tasks/
+
+# Lint tasks for orphaned refs, circular deps, missing fields
+ai-pm lint .tasks/
+
+# List tasks (with optional filters)
+ai-pm task list --path .
+ai-pm task list --status ready --path .
+
+# Create a new task
+ai-pm task create "Implement feature X" --priority high --agent code
+
+# Complete a task
+ai-pm task complete TASK-001 --tokens 5000 --duration 30
+
+# Show the critical path through the task DAG
+ai-pm critical-path .tasks/
+
+# Pick the highest-priority unblocked task ready for work
+ai-pm pick-next .tasks/
+ai-pm pick-next .tasks/ --agent code
+
+# Sprint status
+ai-pm sprint status --path .
+```
+
+### `critical-path`
+
+Shows the longest dependency chain of non-done tasks. Useful for identifying the bottleneck sequence that determines project completion time.
+
+```
+$ ai-pm critical-path backlog/
+
+Critical Path (3 tasks):
+
+  1. TASK-001 — Set up database schema [ready]
+     |
+  2. TASK-002 — Implement API endpoints [blocked]
+     |
+  3. TASK-003 — Write integration tests [blocked]
+```
+
+### `pick-next`
+
+Selects the highest-priority task that is in `ready` status, has all dependencies resolved (done), and is unassigned. Optionally filter by agent type.
+
+```
+$ ai-pm pick-next backlog/
+
+╭─ Pick Next ──────────────────────╮
+│ Next Task                        │
+│   ID:       TASK-002             │
+│   Title:    Implement API        │
+│   Priority: high                 │
+│   Agent:    code                 │
+│   Status:   ready                │
+│   Deps:     TASK-001             │
+╰──────────────────────────────────╯
+```
+
 ## Task Lifecycle
 
 ```
