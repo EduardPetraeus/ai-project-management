@@ -52,6 +52,22 @@ class TestTaskListCommand:
         assert result.exit_code == 0
         assert "TASK-001" in result.output
 
+    def test_list_positional_path(self, tmp_backlog):
+        """Positional path argument works like --path for consistency with other commands."""
+        runner = CliRunner()
+        result = runner.invoke(cli, ["task", "list", str(tmp_backlog)])
+        assert result.exit_code == 0
+        assert "TASK-001" in result.output
+        assert "TASK-002" in result.output
+        assert "TASK-003" in result.output
+
+    def test_list_positional_path_with_filters(self, tmp_backlog):
+        """Positional path argument works together with --status filter."""
+        runner = CliRunner()
+        result = runner.invoke(cli, ["task", "list", str(tmp_backlog), "--status", "done"])
+        assert result.exit_code == 0
+        assert "TASK-001" in result.output
+
     def test_list_no_backlog(self, tmp_path):
         runner = CliRunner()
         result = runner.invoke(cli, ["task", "list", "--path", str(tmp_path)])

@@ -89,12 +89,14 @@ def task():
 
 
 @task.command("list")
+@click.argument("path_arg", required=False, default=None, type=click.Path(exists=True))
 @click.option("--status", default=None, help="Filter by status")
 @click.option("--priority", default=None, help="Filter by priority")
-@click.option("--path", "search_path", type=click.Path(exists=True), default=".", help="Project root or backlog dir")
-def task_list(status: str | None, priority: str | None, search_path: str):
+@click.option("--path", "search_path", type=click.Path(exists=True), default=None, help="Alias for positional path arg")
+def task_list(path_arg: str | None, status: str | None, priority: str | None, search_path: str | None):
     """List tasks from backlog directory."""
-    backlog = find_backlog_dir(Path(search_path))
+    resolved_path = path_arg or search_path or "."
+    backlog = find_backlog_dir(Path(resolved_path))
     if backlog is None:
         console.print("[red]No backlog/ directory found with TASK-*.yaml files[/red]")
         sys.exit(1)
