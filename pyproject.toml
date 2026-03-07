@@ -5,10 +5,35 @@ build-backend = "hatchling.build"
 [project]
 name = "ai-pm"
 version = "1.0.0"
-description = "YAML-based task engine for agentic software development"
+description = "YAML-based task engine for agentic software development — merge-conflict-free project management designed for AI agents"
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.11"
+authors = [
+    { name = "Eduard Petraeus", email = "claus@petraeus.dk" },
+]
+keywords = [
+    "ai",
+    "agent",
+    "task-management",
+    "yaml",
+    "agentic",
+    "project-management",
+    "llm",
+    "automation",
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: Software Development :: Quality Assurance",
+    "Typing :: Typed",
+]
 dependencies = [
     "pyyaml>=6.0",
     "jsonschema>=4.20",
@@ -21,6 +46,13 @@ dev = ["pytest>=8.0", "pytest-cov>=4.0", "ruff>=0.4"]
 
 [project.scripts]
 ai-pm = "ai_pm.cli:cli"
+
+[project.urls]
+Homepage = "https://github.com/EduardPetraeus/ai-project-management"
+Documentation = "https://github.com/EduardPetraeus/ai-project-management#readme"
+Repository = "https://github.com/EduardPetraeus/ai-project-management"
+Issues = "https://github.com/EduardPetraeus/ai-project-management/issues"
+Changelog = "https://github.com/EduardPetraeus/ai-project-management/blob/main/CHANGELOG.md"
 
 [tool.ruff]
 target-version = "py311"

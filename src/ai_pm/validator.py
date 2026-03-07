@@ -13,8 +13,8 @@ from ai_pm.parser import ParseError, discover_yaml_files, load_yaml_file
 
 console = Console()
 
-# Default schemas directory (relative to package)
-SCHEMAS_DIR = Path(__file__).resolve().parent.parent.parent / "schemas"
+# Default schemas directory (bundled with the package)
+SCHEMAS_DIR = Path(__file__).resolve().parent / "schemas"
 
 # Mapping from schema file stem to identifying characteristics
 _SCHEMA_DETECTORS: list[tuple[str, callable]] = []

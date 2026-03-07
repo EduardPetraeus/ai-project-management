@@ -1,147 +1,151 @@
-# ai-project-management
+# ai-pm
 
-YAML-based project management framework for agentic engineering. One file per task, zero merge conflicts. Works solo or multi-team.
+[![PyPI version](https://img.shields.io/pypi/v/ai-pm.svg)](https://pypi.org/project/ai-pm/)
+[![Python](https://img.shields.io/pypi/pyversions/ai-pm.svg)](https://pypi.org/project/ai-pm/)
+[![CI](https://github.com/EduardPetraeus/ai-project-management/actions/workflows/ci.yml/badge.svg)](https://github.com/EduardPetraeus/ai-project-management/actions)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+
+**YAML-based task engine for agentic software development.** One file per task, zero merge conflicts. Designed for AI agents, not humans.
+
+## Why ai-pm?
+
+AI agents working in parallel break traditional project management:
+
+| Problem | Traditional tools | ai-pm |
+|---------|------------------|-------|
+| Two agents edit the same task board | Merge conflict | Each task is a separate YAML file -- no conflicts |
+| Agent needs to parse task status | Scrape UI or freeform text | Machine-readable YAML with JSON Schema validation |
+| Track what changed | Lost in database | Every status change is a git commit |
+| Scale from 1 agent to 10 | Different tool needed | Same format, additive complexity |
+
+**ai-pm is project management built for the agentic era.** If you're building with Claude Code, Cursor, Aider, or any AI coding agent, this is how you coordinate their work.
+
+## Install
+
+```bash
+pip install ai-pm
+```
 
 ## Quick Start
 
 ```bash
-# 1. Copy templates into your project
-cp -r templates/backlog/ your-project/backlog/
-cp templates/ROADMAP.yaml your-project/
-cp templates/ROLES.yaml your-project/
+# Initialize a project with templates and commands
+ai-pm init
 
-# 2. Install Claude Code commands
-cp commands/*.md your-project/.claude/commands/
+# Create your first task
+ai-pm task create "Implement user authentication" --priority high --agent code
 
-# 3. Create your first task
-cp your-project/backlog/TASK-TEMPLATE.yaml your-project/backlog/TASK-001.yaml
-# Edit TASK-001.yaml with real content
+# List tasks
+ai-pm task list
 
-# 4. Start working
-# Use /pick-next-task to claim work
-# Use /complete-task when done
-# Use /create-task to add new tasks
-```
+# Validate all YAML files against schemas
+ai-pm validate backlog/
 
-## Why?
+# Pick the highest-priority unblocked task
+ai-pm pick-next backlog/
 
-AI agents working in parallel need a task system that:
-- **Never creates merge conflicts** — one YAML file per task
-- **Is machine-readable** — agents parse YAML, not freeform text
-- **Has git history** — every status change is a commit
-- **Scales from solo to team** — same format, additive complexity
-
-## Structure
-
-```
-templates/
-├── backlog/TASK-TEMPLATE.yaml    # one file per task
-├── sprints/SPRINT-TEMPLATE.yaml  # sprint goal + task refs
-├── ROADMAP.yaml                  # milestones, not tasks
-├── ROLES.yaml                    # agent routing
-├── TRUST_PROFILE.yaml            # trust levels (governance integration)
-└── METRICS.yaml                  # performance tracking
-
-schemas/
-└── task-schema.json              # JSON Schema for task validation
-
-commands/
-├── pick-next-task.md             # find and claim next task
-├── complete-task.md              # mark task done + update metrics
-└── create-task.md                # scaffold new task
-
-examples/
-├── solo-developer/               # one person, one agent
-└── multi-team/                   # multiple agents, role routing
-
-docs/
-├── PHILOSOPHY.md                 # design decisions
-└── INTEGRATION.md                # connecting to governance + standards
-```
-
-## CLI
-
-Install: `pip install -e .` (or add `src/` to `PYTHONPATH`).
-
-```bash
-# Validate all YAML files against schemas (+ cross-reference check)
-ai-pm validate .tasks/
-
-# Lint tasks for orphaned refs, circular deps, missing fields
-ai-pm lint .tasks/
-
-# List tasks (with optional filters)
-ai-pm task list --path .
-ai-pm task list --status ready --path .
-
-# Create a new task
-ai-pm task create "Implement feature X" --priority high --agent code
-
-# Complete a task
+# Complete a task with metrics
 ai-pm task complete TASK-001 --tokens 5000 --duration 30
 
 # Show the critical path through the task DAG
-ai-pm critical-path .tasks/
+ai-pm critical-path backlog/
 
-# Pick the highest-priority unblocked task ready for work
-ai-pm pick-next .tasks/
-ai-pm pick-next .tasks/ --agent code
+# Lint for orphaned refs, circular deps, missing fields
+ai-pm lint backlog/
 
 # Sprint status
-ai-pm sprint status --path .
-```
-
-### `critical-path`
-
-Shows the longest dependency chain of non-done tasks. Useful for identifying the bottleneck sequence that determines project completion time.
-
-```
-$ ai-pm critical-path backlog/
-
-Critical Path (3 tasks):
-
-  1. TASK-001 — Set up database schema [ready]
-     |
-  2. TASK-002 — Implement API endpoints [blocked]
-     |
-  3. TASK-003 — Write integration tests [blocked]
-```
-
-### `pick-next`
-
-Selects the highest-priority task that is in `ready` status, has all dependencies resolved (done), and is unassigned. Optionally filter by agent type.
-
-```
-$ ai-pm pick-next backlog/
-
-╭─ Pick Next ──────────────────────╮
-│ Next Task                        │
-│   ID:       TASK-002             │
-│   Title:    Implement API        │
-│   Priority: high                 │
-│   Agent:    code                 │
-│   Status:   ready                │
-│   Deps:     TASK-001             │
-╰──────────────────────────────────╯
+ai-pm sprint status
 ```
 
 ## Task Lifecycle
 
 ```
-backlog → ready → in_progress → review → done
-                                  ↑
-                               blocked (unblocked when dependencies resolve)
+backlog --> ready --> in_progress --> review --> done
+                                       ^
+                                    blocked (auto-unblocked when dependencies resolve)
 ```
 
-## Part of the Agentic Engineering OS
+## Project Structure (after `ai-pm init`)
 
-| Repo | Role |
-|------|------|
-| [ai-governance-framework](https://github.com/EduardPetraeus/ai-governance-framework) | What may agents do |
-| **ai-project-management** (this repo) | **What to do** |
-| [ai-engineering-standards](https://github.com/EduardPetraeus/ai-engineering-standards) | How to do it |
-| [ai-project-templates](https://github.com/EduardPetraeus/ai-project-templates) | Scaffolder |
-| [agentic-engineering](https://github.com/EduardPetraeus/agentic-engineering) | Umbrella docs |
+```
+your-project/
+  backlog/
+    TASK-TEMPLATE.yaml      # one file per task
+    TASK-001.yaml
+    TASK-002.yaml
+  sprints/
+    SPRINT-TEMPLATE.yaml    # sprint goal + task refs
+  ROADMAP.yaml              # milestones
+  ROLES.yaml                # agent routing
+  METRICS.yaml              # performance tracking
+  TRUST_PROFILE.yaml        # trust levels
+  .claude/commands/
+    pick-next-task.md        # Claude Code slash commands
+    complete-task.md
+    create-task.md
+```
+
+## Task Format
+
+Each task is a standalone YAML file:
+
+```yaml
+id: TASK-001
+title: "Implement user authentication"
+description: |
+  Build JWT-based auth with refresh token rotation.
+  Store sessions in Redis. Follow OWASP guidelines.
+
+status: ready             # backlog | ready | in_progress | review | done | blocked
+priority: high            # critical | high | medium | low
+agent: code               # code | test | docs | security | review | human
+review: agent-review      # auto-merge | agent-review | human-review
+assignee: null            # agent-session-id or person
+sprint: S001
+
+depends_on: []            # tasks that must complete first
+blocks: [TASK-005]        # tasks waiting on this one
+
+definition_of_done:
+  - "JWT generation and validation working"
+  - "Refresh token rotation implemented"
+  - "Unit tests pass"
+
+tags: [backend, auth]
+estimate: l               # xs | s | m | l | xl
+```
+
+## Schema Validation
+
+All YAML files are validated against bundled JSON Schemas:
+
+```bash
+ai-pm validate .          # validates tasks, sprints, roadmaps, roles, metrics
+ai-pm validate backlog/   # validate only tasks
+```
+
+Schemas auto-detect the file type based on content structure -- no configuration needed.
+
+## Integration with Claude Code
+
+After running `ai-pm init`, your project gets Claude Code slash commands:
+
+- `/pick-next-task` -- find and claim the next task
+- `/complete-task` -- mark a task as done with metrics
+- `/create-task` -- scaffold a new task YAML
+
+These commands work out of the box with Claude Code's `/` command system.
+
+## Examples
+
+See the [`examples/`](examples/) directory for complete setups:
+
+- **[solo-developer](examples/solo-developer/)** -- one person, one agent
+- **[multi-team](examples/multi-team/)** -- multiple agents with role routing and parallel work
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ## License
 

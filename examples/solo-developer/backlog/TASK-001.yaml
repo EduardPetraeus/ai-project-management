@@ -1,9 +1,9 @@
 id: TASK-001
-title: "Set up bronze-layer ingestion for Oura ring data"
+title: "Set up database schema for user service"
 description: |
-  Create the initial data pipeline for ingesting Oura ring data.
-  Read from CSV export, validate schema, write to bronze Parquet.
-  Follow medallion architecture: raw data lands in bronze unchanged.
+  Create the initial database schema for the user service.
+  Define tables for users, roles, and sessions.
+  Include migrations and seed data for development.
 
 status: done
 priority: high
@@ -15,12 +15,12 @@ depends_on: []
 blocks: [TASK-002, TASK-003]
 
 definition_of_done:
-  - "CSV reader handles all Oura export columns"
-  - "Parquet output in bronze/ directory"
-  - "Schema validation catches missing required columns"
+  - "All tables created with proper constraints"
+  - "Migrations run successfully"
+  - "Seed data populates dev environment"
   - "Unit tests pass"
 
-tags: [data-pipeline, bronze, oura]
+tags: [backend, database, schema]
 estimate: m
 
 actual_tokens: 45000
@@ -29,4 +29,4 @@ completed: 2026-01-15
 
 created: 2026-01-10
 updated: 2026-01-15
-notes: "Completed in single session. Schema validation caught 2 edge cases."
+notes: "Completed in single session. Added index on email column."
