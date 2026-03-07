@@ -1,9 +1,9 @@
 id: TASK-002
-title: "Build silver-layer sleep aggregation transform"
+title: "Build user registration and login API endpoints"
 description: |
-  Transform bronze Oura sleep data into silver-layer aggregated metrics.
-  Calculate: total_sleep_hours, deep_sleep_pct, rem_sleep_pct, sleep_score.
-  Output as daily granularity in silver/ directory.
+  Implement REST API endpoints for user registration and login.
+  Use JWT tokens for authentication. Include input validation
+  and proper error responses.
 
 status: ready
 priority: high
@@ -15,12 +15,12 @@ depends_on: [TASK-001]
 blocks: [TASK-005]
 
 definition_of_done:
-  - "SQL transform produces daily sleep metrics"
-  - "All percentage columns sum to <= 100%"
-  - "Null handling for missing nights"
-  - "dbt schema tests pass"
+  - "POST /register creates user and returns token"
+  - "POST /login validates credentials and returns token"
+  - "Input validation rejects malformed requests"
+  - "Unit tests cover happy path and error cases"
 
-tags: [data-pipeline, silver, sleep]
+tags: [backend, api, auth]
 estimate: m
 
 actual_tokens: null

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import shutil
 import sys
 from datetime import date
 from pathlib import Path
@@ -18,10 +19,75 @@ from ai_pm.validator import SCHEMAS_DIR, find_schema_for_file, validate_cross_re
 
 console = Console()
 
+# Bundled resources (shipped with the package)
+_PKG_DIR = Path(__file__).resolve().parent
+_TEMPLATES_DIR = _PKG_DIR / "templates"
+_COMMANDS_DIR = _PKG_DIR / "commands"
+
 
 @click.group()
 def cli():
     """AI Project Management — YAML-based task engine."""
+
+
+@cli.command()
+@click.option("--path", "target", type=click.Path(), default=".", help="Target directory (default: current dir)")
+def init(target: str):
+    """Initialize a project with ai-pm templates, commands, and backlog structure."""
+    dest = Path(target).resolve()
+
+    # Copy templates
+    templates_dest = dest / "backlog"
+    if not templates_dest.exists():
+        templates_dest.mkdir(parents=True)
+        template_src = _TEMPLATES_DIR / "backlog" / "TASK-TEMPLATE.yaml"
+        if template_src.exists():
+            shutil.copy2(template_src, templates_dest / "TASK-TEMPLATE.yaml")
+        console.print(f"  [green]Created[/green] {templates_dest}/")
+    else:
+        console.print(f"  [yellow]Exists[/yellow] {templates_dest}/ (skipped)")
+
+    # Copy top-level template files
+    for name in ["ROADMAP.yaml", "ROLES.yaml", "METRICS.yaml", "TRUST_PROFILE.yaml"]:
+        src = _TEMPLATES_DIR / name
+        dst = dest / name
+        if src.exists() and not dst.exists():
+            shutil.copy2(src, dst)
+            console.print(f"  [green]Created[/green] {dst}")
+        elif dst.exists():
+            console.print(f"  [yellow]Exists[/yellow] {dst} (skipped)")
+
+    # Copy sprint template
+    sprints_dest = dest / "sprints"
+    sprint_src = _TEMPLATES_DIR / "sprints" / "SPRINT-TEMPLATE.yaml"
+    if sprint_src.exists() and not sprints_dest.exists():
+        sprints_dest.mkdir(parents=True)
+        shutil.copy2(sprint_src, sprints_dest / "SPRINT-TEMPLATE.yaml")
+        console.print(f"  [green]Created[/green] {sprints_dest}/")
+
+    # Copy Claude Code commands
+    commands_dest = dest / ".claude" / "commands"
+    if _COMMANDS_DIR.exists():
+        commands_dest.mkdir(parents=True, exist_ok=True)
+        for cmd_file in _COMMANDS_DIR.glob("*.md"):
+            dst = commands_dest / cmd_file.name
+            if not dst.exists():
+                shutil.copy2(cmd_file, dst)
+                console.print(f"  [green]Created[/green] {dst}")
+            else:
+                console.print(f"  [yellow]Exists[/yellow] {dst} (skipped)")
+
+    console.print(
+        Panel(
+            "[green]Project initialized![/green]\n\n"
+            "Next steps:\n"
+            "  1. Edit ROADMAP.yaml with your milestones\n"
+            "  2. Copy backlog/TASK-TEMPLATE.yaml to backlog/TASK-001.yaml\n"
+            "  3. Run: ai-pm validate .\n"
+            "  4. Run: ai-pm task list",
+            title="ai-pm init",
+        )
+    )
 
 
 @cli.command()
@@ -220,8 +286,13 @@ def task_complete(task_id: str, search_path: str, tokens: int | None, duration: 
         console.print("[red]No backlog/ directory found[/red]")
         sys.exit(1)
 
-    # Find the task file
-    task_file = backlog / f"{task_id}.yaml"
+    # Find the task file (with path traversal protection)
+    task_file = (backlog / f"{task_id}.yaml").resolve()
+    try:
+        task_file.relative_to(backlog.resolve())
+    except ValueError:
+        console.print(f"[red]Invalid task ID: {task_id}[/red]")
+        sys.exit(1)
     if not task_file.exists():
         console.print(f"[red]Task file not found: {task_file}[/red]")
         sys.exit(1)

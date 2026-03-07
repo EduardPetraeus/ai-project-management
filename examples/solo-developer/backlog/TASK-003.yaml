@@ -1,13 +1,13 @@
 id: TASK-003
-title: "Build silver-layer activity aggregation transform"
+title: "Write integration tests for auth endpoints"
 description: |
-  Transform bronze Oura activity data into silver-layer metrics.
-  Calculate: steps, calories, active_minutes, activity_score.
-  Daily granularity in silver/ directory.
+  End-to-end tests for the registration and login API.
+  Test with valid and invalid inputs, token expiry,
+  and concurrent sessions.
 
 status: blocked
 priority: medium
-agent: code
+agent: test
 review: agent-review
 assignee: null
 sprint: S001
@@ -15,11 +15,11 @@ depends_on: [TASK-001]
 blocks: []
 
 definition_of_done:
-  - "SQL transform produces daily activity metrics"
-  - "Handles days with zero activity"
-  - "dbt schema tests pass"
+  - "All endpoints tested with valid and invalid inputs"
+  - "Token expiry edge case covered"
+  - "Test suite runs in CI"
 
-tags: [data-pipeline, silver, activity]
+tags: [testing, api, auth]
 estimate: s
 
 actual_tokens: null

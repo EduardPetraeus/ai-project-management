@@ -141,7 +141,7 @@ def circular_tasks():
 @pytest.fixture()
 def schemas_dir():
     """Return path to the actual schemas directory."""
-    return Path(__file__).resolve().parent.parent / "schemas"
+    return Path(__file__).resolve().parent.parent / "src" / "ai_pm" / "schemas"
 
 
 @pytest.fixture()
@@ -153,4 +153,4 @@ def examples_dir():
 @pytest.fixture()
 def templates_dir():
     """Return path to the templates directory."""
-    return Path(__file__).resolve().parent.parent / "templates"
+    return Path(__file__).resolve().parent.parent / "src" / "ai_pm" / "templates"
